@@ -1,0 +1,78 @@
+pst-o() {
+    if [[ $# -eq 0 ]]; then
+        echo "Usage: pst-chain <shorthand> | <command>"
+        echo "Example: echo '#ff0000' | pst-chain 'sa10|co|li5|f'"
+        return 1
+    fi
+
+    local shorthand="$1"
+    local pipeline=""
+    
+    # Split the shorthand by pipes
+    local commands=("${(s:|:)shorthand}")
+    
+    for cmd in "${commands[@]}"; do
+        # Extract command and numeric argument
+        local cmd_char="${cmd[1,2]}"
+        local arg="${cmd[3,-1]}"
+        
+        case "$cmd_char" in
+            "sa") pipeline+=" | pastel saturate ${arg:-1}" ;;
+            "ds") pipeline+=" | pastel desaturate ${arg:-1}" ;;
+            "da") pipeline+=" | pastel darken ${arg:-1}" ;;
+            "li") pipeline+=" | pastel lighten ${arg:-1}" ;;
+            "ro") pipeline+=" | pastel rotate ${arg:-0}" ;;
+            "co") pipeline+=" | pastel complement" ;;
+            "f")  pipeline+=" | pastel format hex" ;;
+            "rn") pipeline+=" | pastel random -s rgb -n ${arg:-1}" ;;
+            "rv") pipeline+=" | pastel random -s vivid -n ${arg:-1}" ;;
+            "rl") pipeline+=" | pastel random -s lch_hue -n ${arg:-1}" ;;
+            "rg") pipeline+=" | pastel random -s gray -n ${arg:-1}" ;;
+            "di") pipeline+=" | xargs -d'\n' pastel distinct -m CIEDE2000 ${arg:-4}" ;;
+            "gr") pipeline+=" | xargs -d'\n' pastel gradient --colorspace Lab --number ${arg:-2}" ;;
+            "h1") pipeline+=" | head -n 1" ;;
+            "hx") pipeline+=" | head -n ${arg:-10}" ;;
+            "t1") pipeline+=" | tail -n 1" ;;
+            "tx") pipeline+=" | tail -n ${arg:-10}" ;;
+            "ev") pipeline+=" | awk 'NR % 2 == 0 {print \$0;}'" ;;
+            "od") pipeline+=" | awk 'NR % 2 == 1 {print \$0;}'" ;;
+            *)    echo "Unknown command: $cmd_char"; return 1 ;;
+        esac
+    done
+    
+    # Remove the leading " | " from the first command
+    pipeline="${pipeline# | }"
+    
+    # Execute the pipeline
+    eval "$pipeline"
+}
+
+# Completion function for the shorthand
+_pst-chain() {
+    local -a commands
+    commands=(
+        'sa[number]:saturate by number%'
+        'ds[number]:desaturate by number%'
+        'da[number]:darken by number%'
+        'li[number]:lighten by number%'
+        'ro[degrees]:rotate hue by degrees'
+        'co:complement color'
+        'f:format as hex'
+        'rn[count]:random RGB colors'
+        'rv[count]:random vivid colors'
+        'rl[count]:random LCH hue colors'
+        'rg[count]:random gray colors'
+        'di[count]:distinct colors'
+        'gr[count]:gradient with count colors'
+        'h1:head first line'
+        'hx[count]:head count lines'
+        't1:tail last line'
+        'tx[count]:tail count lines'
+        'ev:even lines'
+        'od:odd lines'
+    )
+    
+    _describe 'command' commands
+}
+
+compdef _pst-chain pst-chain
