@@ -25,7 +25,13 @@ RPROMPT='\
 %{$fg[$NCOLOR]%}\
 $(git_prompt_info) \
 %{$reset_color%}\
-%{$bg[black]%}%{$fg[blue]%}[%U%t%u]\
+$(confix_prompt_info) \
+%{$reset_color%}\
+${CSYMB[misc][5]} \
+%{$bg[black]%}%{$fg[blue]%}\
+${CSYMB[separators][5]}\
+%U%T%u\
+${CSYMB[separators][6]}\
 %{$reset_color%}'
 
 ZSH_THEME_GIT_PROMPT_PREFIX="%{${fg_bold[yellow]}%}${CSYMB[separators][1]}%{${fg_bold[blue]}%}"

@@ -1,7 +1,7 @@
-pstr() {
+huex() {
     if [[ $# -eq 0 ]]; then
-        echo "Usage: pst <shorthand> | <command>"
-        echo "Example: echo '#ff0000' | pst 's10cL5f'"
+        echo "Usage: huex <shorthand> | <command>"
+        echo "Example: echo '#ff0000' | huex 's10cL5f'"
         echo "Single-letter commands:"
         echo "  s[number]  - saturate (1-999 = 0.01-9.99)"
         echo "  d[number]  - desaturate (1-999 = 0.01-9.99)"
@@ -90,7 +90,7 @@ pstr() {
 }
 
 # Completion function for the shorthand
-_pst() {
+_huex() {
     local -a commands
     commands=(
         's[number]:saturate by number% (1-999 = 0.01-9.99)'
@@ -117,4 +117,4 @@ _pst() {
     _describe 'command' commands
 }
 
-compdef _pst pst
+compdef _huex huex
